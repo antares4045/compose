@@ -7,13 +7,13 @@ import threading
 import json
 
 from statusWindow import Window, QApplication
-from debouncer import debouncer
+from throttle import throttle
 
 app = QApplication(sys.argv)
 window = Window()
 window.show()
 
-countSubprocess = 200
+countSubprocess = 300
 # try:
 #     countSubprocess = int(sys.argv[len(sys.argv)-1])
 # except:
@@ -70,7 +70,15 @@ statuses = {
 
 update_prefix = "UPDATE"
 
-update_state_deb = lambda stageName, stage: window.updateStateSignal.emit(stageName, stage) #debouncer(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage))
+# update_state_deb = lambda stageName, stage: window.updateStateSignal.emit(stageName, stage) #debouncer(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage))
+
+update_state_deb_support = {}
+def update_state_deb(stageName, stage):
+    if stageName not in update_state_deb_support:
+         update_state_deb_support[stageName] = throttle(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage), 100)
+    
+    update_state_deb_support[stageName](stageName, stage)
+
 
 class User:
     def __init__(self, index):
