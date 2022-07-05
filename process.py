@@ -16,8 +16,8 @@ except:
 baseUrl = "http://127.0.0.1:8181/" #"http://127.0.0.1:8181/" | "http://192.168.4.19:8181/"
 timeoutTrys = 60 * 10
 networkReTrys = 50
-maxStartSleep = 10
-waitsleep = 1.5
+maxStartSleep = 30
+waitsleep = 1
 
 
 class bcolors:
@@ -238,18 +238,22 @@ class User:
 import random;
 
 
-def randSleep():
-    duration = random.random() * maxStartSleep
-    time.sleep(duration)
-    return True, str(duration) + ";" + datetime.datetime.now().isoformat()
+def randSleep(min, diff):
+    def res():
+        duration = min + random.random() * diff
+        time.sleep(duration)
+        return True, str(duration) + ";" + datetime.datetime.now().isoformat()
+    return res
 
 
-step("start_sleep", randSleep)
+step("start_sleep", randSleep(0, maxStartSleep))
 
 user = User()
 loginStatus = step("CMS.LOGIN", user.loginSend)
 if loginStatus == True:
     loginStatus = step("CMS.LOGIN_RES", user.loginGet)
+
+#step("afterLogin_sleep", randSleep(1, 2))
 
 if loginStatus == True:
     connectorCreated = step("CN.CREATE", user.cnCreateSend)
@@ -275,16 +279,3 @@ if loginStatus == True:
 
 if loginStatus == True:
     step("CMS.LOGOUT", user.logout)
-
-# print("UPDATE", 0, "success", 0, "мой id -- это", index)
-# print("всякий бред можно писать -- он попадёт в лог, но не в итоговый результат")
-# start = datetime.datetime.now()
-# time.sleep(index)
-# stop = datetime.datetime.now()
-# print("UPDATE", "первый_слип", "success", -(start-stop).total_seconds())
-# start = datetime.datetime.now()
-# print(1, index)
-# time.sleep(index)
-# stop = datetime.datetime.now()
-# print("UPDATE", "второй_слип", "статус_может_быть_неожиданным", -(start-stop).total_seconds())
-# print(2, index)
