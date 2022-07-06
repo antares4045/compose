@@ -9,19 +9,12 @@ import json
 from statusWindow import Window, QApplication
 from throttle import throttle
 
+from config import countSubprocess, windowUpdateThrottle, CMD_PREFIX, SYSTEM_ENCODING, update_prefix
+
 app = QApplication(sys.argv)
 window = Window()
 window.show()
 
-countSubprocess = 300
-# try:
-#     countSubprocess = int(sys.argv[len(sys.argv)-1])
-# except:
-#     pass
-
-CMD_PREFIX = ["powershell"]
-
-SYSTEM_ENCODING='cp1251'#'utf-8'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -68,21 +61,20 @@ def genStatus():
 statuses = {
 }
 
-update_prefix = "UPDATE"
 
 # update_state_deb = lambda stageName, stage: window.updateStateSignal.emit(stageName, stage) #debouncer(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage))
 
 update_state_deb_support = {}
 def update_state_deb(stageName, stage):
     if stageName not in update_state_deb_support:
-         update_state_deb_support[stageName] = throttle(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage), 100)
+         update_state_deb_support[stageName] = throttle(lambda stageName, stage: window.updateStateSignal.emit(stageName, stage), windowUpdateThrottle)
     
     update_state_deb_support[stageName](stageName, stage)
 
 
 class User:
     def __init__(self, index):
-        self.process = Process(["python", "-u", "process.py", index])
+        self.process = Process([sys.executable, "-u", "process.py", index])
         self.index = index
 
     def scan(self):

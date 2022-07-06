@@ -7,17 +7,14 @@ import json
 
 from sympy import arg
 
+from config import baseUrl, timeoutTrys, networkReTrys, maxStartSleep, waitsleep
+
 index = 0
 try:
     index = int(sys.argv[len(sys.argv)-1]) # возможно порядковый номер понадобится для партиционирования
 except:
     pass
 
-baseUrl = "http://127.0.0.1:8181/" #"http://127.0.0.1:8181/" | "http://192.168.4.19:8181/"
-timeoutTrys = 60 * 10
-networkReTrys = 50
-maxStartSleep = 30
-waitsleep = 1
 
 
 class bcolors:
