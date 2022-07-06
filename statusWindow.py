@@ -1,19 +1,25 @@
 from statistics import mean
-from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QStyle, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QStyle, QHBoxLayout, QVBoxLayout, QScrollArea
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt, pyqtSignal
 import json
 
-class Window(QWidget):
+class Window(QScrollArea):
     updateStateSignal = pyqtSignal(str, dict)
 
     def __init__(self):
         super().__init__()
+        widget = QWidget()
+        self.setMinimumWidth(1000)
+
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         self.labels = {}
         self.mainLayout = QVBoxLayout()
 
-        self.setLayout(self.mainLayout)
+        self.setWidgetResizable(True)
+        widget.setLayout(self.mainLayout)
+        self.setWidget(widget)
 
         self.updateStateSignal.connect(self.updateState)
     
